@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>TuPropina - Real Market Elite</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#556b2f">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { margin:0; background-color:#000; font-family:Arial,sans-serif; color:white; min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 60px; overflow-x: hidden; }
+
+        
+
+        .header-bar { height:40px; background-color:#556b2f; width:100%; display:flex; align-items:center; justify-content: space-between; padding: 0 15px; position:fixed; top:0; z-index:100; }
+
+        .brand-title { color:white; font-size:20px; font-weight:bold; text-transform:uppercase; }
+
+        
+
+        .header-icons-right { display: flex; align-items: center; gap: 20px; }
+
+        .icon-btn { color: white; font-size: 1.3em; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
+
+
+
+        .nav-tabs-top { display: flex; justify-content: space-around; background: #1a1a1a; margin-top: 40px; border-bottom: 2px solid #556b2f; }
+
+        .nav-tabs-bottom { display: flex; justify-content: space-around; background: #1a1a1a; border-top: 1px solid #333; position: fixed; bottom: 40px; width: 100%; z-index: 99; }
+
+        .tab-link { padding: 15px 10px; color: #888; cursor: pointer; font-size: 0.65em; font-weight: bold; text-transform: uppercase; flex: 1; text-align: center; }
+
+        .tab-link.active { color: white; background: rgba(107, 142, 35, 0.2); border-bottom: 3px solid #6b8e23; }
+
+        .main-content { flex: 1; padding-top: 20px; padding-bottom: 100px; }
+
+        .top-wrapper { display:flex; justify-content:center; width:100%; margin-bottom: 20px; }
+
+        .top-box { background-color:rgba(255,255,255,0.1); width:90%; max-width:380px; padding:15px; border-radius:24px; }
+
+        .tasa-usdt { text-align:center; margin-bottom:15px; display: flex; flex-direction: column; align-items: center; }
+
+        .input-wrapper-main { width: 180px; position:relative; display:flex; align-items:center; }
+
+        .input-wrapper { position:relative; display:flex; align-items:center; }
+
+        .input-wrapper input, .input-wrapper-main input { width:100%; padding:10px 10px 10px 40px; border-radius:50px; border:none; background-color:#ffd700; font-weight:bold; font-size:1.1em; color:#000; outline:none; text-align:center; }
+
+        .bs-inside { position:absolute; left:6px; background:#000; color:#fff; font-size:10px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-weight:bold; z-index:2; }
+
+        
+
+        .bottom-row { display:flex; justify-content:space-between; gap:15px; perspective: 1000px; }
+
+        .card-wrapper { width: 48%; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 5px; border-radius: 15px; transition: 0.3s; }
+
+        .card-wrapper.selected { background-color: rgba(107, 142, 35, 0.4); border: 1px solid #6b8e23; }
+
+        
+
+        .fixed-title { color:#ffd700; font-size:0.7em; margin-bottom:5px; text-align: center; text-transform: uppercase; font-weight: bold; }
+
+        .field-top { width:100%; position: relative; height: 60px; transform-style: preserve-3d; transition: transform 0.6s; pointer-events: none; }
+
+        .do-flip { transform: rotateY(180deg); }
+
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; }
+
+        .face-front { transform: rotateY(0deg); }
+
+        .face-front input { background-color: #6b8e23 !important; color: white !important; }
+
+        .face-back { transform: rotateY(180deg); }
+
+        .face-back input { background-color: #ffd700 !important; color: black !important; }
+
+        
+
+        .date-row { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
+
+        .date-display { color: #ffd700; font-size: 0.8em; font-weight: bold; }
+
+        
+
+        #switchArea { display: none; align-items: center; justify-content: center; margin-top: 10px; gap: 10px; font-size: 0.75em; color: #ffd700; }
+
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+
+        input:checked + .slider { background-color: #556b2f; }
+
+        input:checked + .slider:before { transform: translateX(16px); }
+
+
+
+        .container { max-width:380px; margin:0 auto; background-color:#1a1a1a; padding:25px; border-radius:24px; }
+
+        .field { margin-bottom:18px; }
+
+        .field label { display:block; margin-bottom:5px; font-size:0.75em; color:#bbb; font-weight: bold; }
+
+        .field input { width:100%; padding:12px; border-radius:12px; border:none; text-align:center; font-size:1.1em; background-color:#fff; color:#000; outline:none; }
+
+        .field input[readonly] { background-color:#3b5f5f; color:#eaffea; font-weight:bold; }
+
+        .calc-section { display: none; }
+
+        .calc-section.active { display: block; }
+
+        #shopping { 
+
+    background-color: #000; 
+
+    min-height: 100vh; 
+
+    padding-top: 10px;
+
+}
+
+#lista-productos div {
+
+    transition: transform 0.2s;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+
+}
+
+#lista-productos div:active {
+
+    transform: scale(0.95); /* Efecto de pulsación al tocarlo */
+
+}
+
+        /* BOTÓN REVISAR PAGO */
+
+        .btn-check-binance { width: 100%; padding: 15px; background-color: #FCD535; color: #000; border: none; border-radius: 12px; font-weight: 900; font-size: 1em; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+
+        .btn-pay-binance { width: 100%; padding: 15px; background-color: #FCD535; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 1em; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+
+
+
+        .modal-ticket { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+
+        .ticket-box { background: white; color: black; padding: 25px; border-radius: 12px; text-align: center; width: 280px; border-top: 8px solid #6b8e23; }
+
+        .btn-copy { background: #25d366; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        
+
+        .footer-bar { height:40px; background-color:#556b2f; width:100%; position:fixed; bottom:0; z-index:100; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font-size: 0.7em; color: rgba(255,255,255,0.7); }
+
+        .tether-svg { width: 24px; height: 24px; fill: white; cursor: pointer; 
+
+          /* Animación para que el icono gire */
+
+@keyframes girar {
+
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.girando {
+  display: inline-block;
+  animation: girar 1s linear infinite;
+}
+    </style>
+
+</head>
+
+<body>
+<div id="modalBancos" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:flex-end; justify-content:center;">
+    <div style="background:white; width:100%; max-width:500px; height:85vh; border-top-left-radius:25px; border-top-right-radius:25px; display:flex; flex-direction:column; animation: subir 0.3s ease-out;">
+        
+        <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; color:#008080;">Precio en Bancos</h3>
+            <i class="fas fa-times" onclick="cerrarTasas()" style="cursor:pointer; font-size:22px; color:#999;"></i>
+        </div>
+
+        <div style="padding:10px 20px;">
+            <input type="text" id="buscador" placeholder="Buscar banco..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" oninput="filtrarBancos()">
+        </div>
+
+        <div id="listaContenedor" style="flex:1; overflow-y:auto; padding:15px; -webkit-overflow-scrolling: touch;">
+            <p style="text-align:center;">Cargando tasas oficiales...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes subir { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .card-banco { display:flex; align-items:center; background:#fff; padding:15px; border-radius:15px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); border:1px solid #f0f0f0; }
+    .img-logo { width:50px; height:50px; margin-right:15px; object-fit:contain; }
+</style>
+
+<script>
+    const URL_JSON = "https://raw.githubusercontent.com/alfonsocamacho00089-cloud/captura_bcv.py/main/bancos.json";
+    
+    // Aquí pon los nombres de las imágenes exactos que subiste a GitHub
+    const BASE_URL_LOGOS = "https://raw.githubusercontent.com/alfonsocamacho00089-cloud/captura_bcv.py/main/";
+
+    function abrirTasas() {
+        document.getElementById('modalBancos').style.display = 'flex';
+        actualizarLista();
+    }
+
+    function cerrarTasas() {
+        document.getElementById('modalBancos').style.display = 'none';
+    }
+
+    async function actualizarLista() {
+        try {
+            const res = await fetch(URL_JSON);
+            const datos = await res.json();
+            const contenedor = document.getElementById('listaContenedor');
+            contenedor.innerHTML = '';
+
+            datos.forEach(b => {
+                let nombreLimpio = b.banco.replace(/\\u00e9/g, 'é').replace(/\\u00ed/g, 'í').replace(/\\u00f3/g, 'ó');
+                
+                // Intentamos armar el nombre del logo (ej: "Banesco" -> "banesco.png")
+                let nombreLogo = nombreLimpio.toLowerCase().split(' ')[0] + ".png"; 
+
+                contenedor.innerHTML += `
+                    <div class="card-banco">
+                        <img src="${BASE_URL_LOGOS}${nombreLogo}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2830/2830284.png'" class="img-logo">
+                        <div style="flex:1">
+                            <div style="font-size:12px; color:#888;">Banco</div>
+                            <div style="font-weight:bold; color:#333;">${nombreLimpio}</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:12px; color:#888;">Precio</div>
+                            <div style="font-size:20px; font-weight:bold; color:#008080;">${parseFloat(b.precio).toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+</script>
+
+<div class="header-bar">
+
+    <span class="brand-title">TuPropina</span>
+
+    <div class="header-icons-right">
+
+      <a href="#" class="icon-btn" onclick="openTab('shopping')"><i class="fas fa-house"></i></a>
+
+        <div class="icon-btn" onclick="alert ('proximanete')"><i class="fas"></i></div>
+
+    </div>
+
+</div>
+
+
+
+<<nav class="nav-tabs-top">
+
+  <div class="tab-link active" onclick="openTab('comercio')">Comercio</div>
+
+  <div class="tab-link" onclick="openTab('cliente')">Cliente</div>
+
+  <div class="tab-link" onclick="openTab('exchange')">USDT P2P</div>
+
+  <div class="tab-link" onclick="openTab('shopping')">Shopping</div> </nav>
+
+
+
+<div class="main-content">
+
+  <div class="top-wrapper">
+
+    <div class="top-box">
+
+      <div class=tasa-usdt
+       </div>
+          <div class="fixed-title" </div>tasa USDT </div>
+          
+        <input type="number" id="adjInput" value="4.21" step="0.01" style="display:none;">
+
+        <div class="input-wrapper-main"><span class="bs-inside">Bs</span><input type="text" id="p2pRate" readonly></div>
+
+    </div> 
+
+    
+
+      <div class="bottom-row">
+
+        <div class="card-wrapper selected" id="cardBCV" onclick="selectTasa('bcv')">
+
+          <div class="fixed-title">tasa BCV</div>
+
+          <div class="field-top do-flip" id="flipBCV">
+
+            <div class="face face-front"><div class="input-wrapper"><span class="bs-inside">Bs</span><input type="number" id="bcvRate" readonly></div></div>
+
+            <div class="face face-back"><div class="input-wrapper"><span class="bs-inside">Bs</span><input type="number" id="bcvRateBack" readonly></div></div>
+
+         </div> 
+
+         </div> 
+
+        <div class="card-wrapper" id="cardEuro" onclick="selectTasa('euro')">
+          <div class="fixed-title">Tasa EURO</div>
+          <div class="field-top do-flip" id="flipEuro">
+            <div class="face face-front"><div class="input-wrapper"><span class="bs-inside">Bs</span><input type="number" id="euroRate" readonly></div></div>
+            <div class="face face-back"><div class="input-wrapper"><span class="bs-inside">Bs</span><input type="number" id="euroRateBack" readonly></div></div>
+            
+
+          </div>
+
+        </div>
+
+      </div>
+
+     <div class="date-row" onclick="cargarTasas()" style="cursor:pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; margin-top: 10px; margin-bottom: 10px;">
+
+
+        <div class="card-container" style="height: 25px; width: 150px; margin: 0 auto 5px auto; perspective: 1000px;">
+    <div style="position: relative; height: 35px; width: 100%; display: flex; justify-content: center; margin-bottom: 10px;">
+    
+    <div id="divFechaNext" style="position: absolute; background: #1a1a1a; padding: 3.5px 15px; border-radius: 8px; border: 1px solid #333; box-shadow: 0 0px 0px rgba(0,0,0,0.5); display: block;">
+        <span id="dateDisplay" style="color: #ffd700; font-size: 1.1em; font-weight: bold;">--/--/----</span>
+    </div>
+
+    <div id="divFechaHoy" style="position: absolute; background: #6b8e2; padding: 3px 15px; border-radius: 9px; border: 1px solid #777; box-shadow: 0 0px 0px rgba(0,0,0,0.6); display: none;">
+        <span id="dateNextDisplay" style="color: #ffd70; font-size: 1.1em; font-weight: bold;">--/--/----</span>
+    </div>
+
+        <div class="back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; background: transparent; border: none; transform: rotateX(180deg);">
+            <span id="dateNextDisplay" style="color: #ffd700; font-size: 1.1em; font-weight: bold;">--/--/----</span>
+
+        </div>
+    </div>
+</div>
+  <div style="color: #ffd700; display: flex; align-items: center; gap: 6px; font-size: 0.75em; font-weight: bold; text-transform: uppercase;">
+          <span id="iconoActualizar" style="font-size: 1.2em; display: inline-block;">♻️</span>
+          <span id="timeDisplay"></span>
+
+        </div>
+      
+      
+     
+</div>
+      <div id="timeP2PDisplay" style="color: #ffd700; font-size: 0.75em; font-weight: bold; text-align: center">
+    ÚLTIMA ACTUALIZACIÓN P2P: Cargando...
+</div>
+      
+
+      <div id="switchArea">
+
+        <span>mañana</span>
+
+        <label class="switch"><input type="checkbox" id="nextDaySwitch" onchange="toggleFlip()" checked><span class="slider"></span></label>
+
+        <span>hoy</span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="container">
+
+    <div id="comercio" class="calc-section active">
+
+        <div class="field"><label>Precio Producto (USD)</label><input type="number" id="priceUSD" placeholder="0.00" inputmode="decimal"></div>
+
+        <div class="field"><label id="labelVES">Bolívares + IGTF</label><input type="text" id="totalVES" readonly></div>
+
+        <div class="field"><label>Total USDT</label><input type="text" id="totalUSDT" readonly style="background-color:#1e3a1e;"></div>
+
+        
+
+        <a href="bnc://app.binance.com/payment/main" class="btn-check-binance">
+
+            <i class="fas fa-search-dollar"></i> REVISAR PAGO (BINANCE)
+
+        </a>
+
+    </div>
+
+    
+
+    <div id="cliente" class="calc-section">
+
+        <div class="field"><label>Costo Producto (USD)</label><input type="number" id="priceCli" placeholder="0.00" inputmode="decimal"></div>
+
+        <div class="field"><label id="labelCli">Bolívares + IGTF</label><input type="text" id="bsCliBCV" readonly></div>
+
+        <div class="field"><label>Monto en USDT</label><input type="text" id="usdtCliFinal" readonly style="background-color:#1e3a1e;"></div>
+
+        <a href="bnc://app.binance.com/payment/main" class="btn-pay-binance"><strong>🟡 PAGAR CON BINANCE APP</strong></a>
+
+    </div>
+
+
+
+    <div id="exchange" class="calc-section">
+
+        <div class="field"><label>Compra (Tasa: <span id="labBuy">--</span>)</label><input type="number" id="uBuy" placeholder="Monto USDT" inputmode="decimal"></div>
+
+        <div class="field"><label>Pagar al cliente (Bs)</label><input type="text" id="resBuy" readonly></div>
+
+        <div class="field"><label>Venta (Tasa: <span id="labSell">--</span>)</label><input type="number" id="uSell" placeholder="Monto USDT" inputmode="decimal"></div>
+
+        <div class="field"><label>Recibir del cliente (Bs)</label><input type="text" id="resSell" readonly></div>
+
+    </div>
+
+
+
+    <div id="cierre" class="calc-section">
+
+        <div class="field"><label>Ventas Totales (USDT)</label><input type="number" id="vCierre" placeholder="0.00" inputmode="decimal"></div>
+
+        <div class="field"><label>Bolívares Netos (Menos 3%)</label><input type="text" id="rCierre" readonly style="background-color:#1e3a1e;"></div>
+
+    </div>
+
+
+
+    <div id="grafica" class="calc-section">
+
+        <canvas id="miGrafica" height="200"></canvas>
+
+    </div>
+
+
+
+    <div id="nota" class="calc-section">
+
+        <div class="field"><label>Confirmar Pago Recibido (USDT)</label><input type="number" id="nInput" placeholder="0.00" inputmode="decimal"></div>
+
+        <button onclick="generarNota()" style="width:100%; padding:15px; background:#6b8e23; color:white; border:none; border-radius:12px; font-weight:bold;">CONFIRMAR Y NOTIFICAR</button>
+
+    </div>
+
+  </div>
+
+  <div id="shopping" class="calc-section">
+
+        <div id="lista-productos" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px;">
+
+            <p style="color: #888; text-align: center; grid-column: 1 / -1;">Cargando catálogo de Dropi...</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<nav class="nav-tabs-bottom">
+
+  <div class="tab-link" onclick="openTab('cierre')">Cierre</div>
+
+  <div class="tab-link" onclick="openTab('grafica')">Gráfica</div>
+
+  <div class="tab-link" onclick="openTab('nota')">Nota</div>
+
+</nav>
+
+
+
+<div id="modalTicket" class="modal-ticket">
+
+    <div class="ticket-box">
+
+        <h3 style="color:#556b2f;">PAGO CONFIRMADO</h3>
+
+        <h1 id="nFinal" style="margin:15px 0; font-size: 2.2em;">0.00 USDT</h1>
+
+        <button class="btn-copy" onclick="copiarWA()">ENVIAR WHATSAPP</button>
+
+        <button onclick="document.getElementById('modalTicket').style.display='none'" style="margin-top:10px; width:100%; padding:8px; background:#eee; border:none; border-radius:8px;">CERRAR</button>
+
+    </div>
+
+</div>
+
+
+
+<div class="footer-bar">
+
+    <div onclick="alert('Tasas Plataformas próximamente')">
+
+                <svg class="tether-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.4
